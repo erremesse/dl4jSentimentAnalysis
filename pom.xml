@@ -1,0 +1,98 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>es.ita.moriarty</groupId>
+  <artifactId>dl4jSentimentAnalysis</artifactId>
+  <version>0.0.1-SNAPSHOT</version>
+  <name>dl4jSentimentAnalysis</name>
+  
+  <description>This module ... </description>
+
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <dl4j.version>1.0.0-beta</dl4j.version> <!-- As of May'2018 -->
+    <nd4j.backend>nd4j-native-platform</nd4j.backend> <!-- nd4j-cuda-7.5-platform -->
+    <nd4j.version>1.0.0-beta</nd4j.version>
+    <datavec.version>1.0.0-beta</datavec.version>  
+    <guava.version>19.0</guava.version>    
+    <scala.binary.version>2.10</scala.binary.version> <!-- 2.10 || 2.11 -->
+  </properties>
+    
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.nd4j</groupId>
+                <artifactId>nd4j-native-platform</artifactId>
+                <version>${nd4j.version}</version>  
+            </dependency>
+            <dependency>
+                <groupId>org.nd4j</groupId>
+                <artifactId>nd4j-cuda-7.5-platform</artifactId>
+                <version>${nd4j.version}</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+    
+  <dependencies>
+  <!-- DL4j main dependencies-->
+        <!-- Core DL4J functionality -->
+        <dependency>
+            <groupId>org.deeplearning4j</groupId>
+            <artifactId>deeplearning4j-core</artifactId>
+            <version>${dl4j.version}</version>
+        </dependency>
+        
+        <dependency>
+            <groupId>org.deeplearning4j</groupId>
+            <artifactId>deeplearning4j-nlp</artifactId>
+            <version>${dl4j.version}</version>
+        </dependency>
+        
+        <!-- deeplearning4j-ui is used for HistogramIterationListener + visualization: see http://deeplearning4j.org/visualization -->
+    	<!-- <dependency>
+       	 	<groupId>org.deeplearning4j</groupId>
+        	<artifactId>deeplearning4j-ui_2.11</artifactId>
+        	<version>${dl4j.version}</version>
+    	</dependency>  -->
+    	
+        <!-- Force guava versions for using UI/HistogramIterationListener 
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>${guava.version}</version>
+        </dependency> -->
+        
+        <!-- ND4J backend -->
+        <dependency>
+            <groupId>org.nd4j</groupId>
+            <artifactId>${nd4j.backend}</artifactId>
+        </dependency>
+        
+        <!-- Datavec is our library vectorizing and loading data -->
+		<dependency>
+            <groupId>org.datavec</groupId>
+            <artifactId>datavec-api</artifactId>
+            <version>${datavec.version}</version>
+		</dependency>
+		
+		<dependency>
+        	<groupId>org.deeplearning4j</groupId>
+        	<artifactId>dl4j-spark_${scala.binary.version}</artifactId>
+        	<version>${dl4j.version}</version>
+        </dependency>
+		
+		<!--  Other dependencies -->
+		<!-- https://mvnrepository.com/artifact/com.opencsv/opencsv -->
+		<dependency>
+    		<groupId>com.opencsv</groupId>
+    		<artifactId>opencsv</artifactId>
+    		<version>4.2</version>
+		</dependency>
+		<!-- https://mvnrepository.com/artifact/org.apache.commons/commons-csv 
+		<dependency>
+    		<groupId>org.apache.commons</groupId>
+    		<artifactId>commons-csv</artifactId>
+    		<version>1.5</version>
+		</dependency> -->
+		
+	</dependencies>
+</project>
