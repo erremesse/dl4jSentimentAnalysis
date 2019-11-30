@@ -9,12 +9,13 @@
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <dl4j.version>1.0.0-beta</dl4j.version> <!-- As of May'2018 -->
+    <dl4j.version>1.0.0-beta3</dl4j.version> <!-- As of Nov'2018 -->
+    <dl4j.spark.version>1.0.0-beta3_spark_2</dl4j.spark.version> <!-- 1.0.0-beta_spark_2 -->
     <nd4j.backend>nd4j-native-platform</nd4j.backend> <!-- nd4j-cuda-7.5-platform -->
-    <nd4j.version>1.0.0-beta</nd4j.version>
-    <datavec.version>1.0.0-beta</datavec.version>  
+    <nd4j.version>1.0.0-beta3</nd4j.version>
+    <datavec.version>1.0.0-beta3</datavec.version>  
     <guava.version>19.0</guava.version>    
-    <scala.binary.version>2.10</scala.binary.version> <!-- 2.10 || 2.11 -->
+    <scala.binary.version>2.11</scala.binary.version> <!-- 2.10 || 2.11 -->
   </properties>
     
     <dependencyManagement>
@@ -74,11 +75,18 @@
             <version>${datavec.version}</version>
 		</dependency>
 		
+		<!-- Gradient sharing -->
+		<dependency>
+    		<groupId>org.deeplearning4j</groupId>
+    		<artifactId>dl4j-spark-parameterserver_${scala.binary.version}</artifactId>
+    		<version>${dl4j.spark.version}</version>
+		</dependency>
+		<!-- Parameter averaging -->
 		<dependency>
         	<groupId>org.deeplearning4j</groupId>
         	<artifactId>dl4j-spark_${scala.binary.version}</artifactId>
-        	<version>${dl4j.version}</version>
-        </dependency>
+        	<version>${dl4j.spark.version}</version>
+		</dependency>
 		
 		<!--  Other dependencies -->
 		<!-- https://mvnrepository.com/artifact/com.opencsv/opencsv -->
@@ -93,6 +101,18 @@
     		<artifactId>commons-csv</artifactId>
     		<version>1.5</version>
 		</dependency> -->
+		<!-- https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-core 
+		<dependency>
+    		<groupId>com.fasterxml.jackson.core</groupId>
+    		<artifactId>jackson-core</artifactId>
+    		<version>2.6.5</version>
+		</dependency> -->
+		<!-- https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-databind -->
+		<dependency>
+    		<groupId>com.fasterxml.jackson.core</groupId>
+    		<artifactId>jackson-databind</artifactId>
+   			 <version>2.6.5</version>
+		</dependency>
 		
 	</dependencies>
 </project>
