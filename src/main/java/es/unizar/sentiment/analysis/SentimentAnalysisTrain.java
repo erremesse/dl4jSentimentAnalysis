@@ -2,7 +2,6 @@ package es.unizar.sentiment.analysis;
 
 import java.io.IOException;
 import java.util.Collection;
-import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 
 import org.deeplearning4j.earlystopping.EarlyStoppingConfiguration;
@@ -34,36 +33,10 @@ import org.nd4j.linalg.dataset.api.iterator.DataSetIterator;
 import org.nd4j.linalg.learning.config.RmsProp;
 import org.nd4j.linalg.lossfunctions.LossFunctions;
 
+import es.unizar.sentiment.analysis.configuration.ConfigurationLoader;
 import es.unizar.sentiment.analysis.data.SentimentIterator;
 
 public class SentimentAnalysisTrain {
-	private static final String WORD2VEC_MODEL_PATH = "./src/main/resources/word2vec/ES/SBW-vectors-300-min5.bin.gz";
-													//"./src/main/resources/word2vec/ES/TCH_W2V_100.zip"; //TODO
-													//"./src/main/resources/word2vec/ES/SBW-vectors-300-min5.bin.gz"; 
-													//"./src/main/resources/word2vec/EN/raw_eng_model.zip";
-	//private static final String WORD_VECTORS_PATH = ";
-	//private static final String DATASET_PATH = "./src/main/resources/data/";
-	private static final String TRAINSET_PATH = "./src/main/resources/data/ES/train/Turismo_General_Comunicacion_Hackathon_5l-TAG_sinduplicados.csv"; //"./src/main/resources/data/ES/train/InterTASS_ES_TRAIN.csv"; 
-												//"./src/main/resources/data/ES/train/Turismo_General_Comunicacion_Hackathon_5l-TAG_sinduplicados.csv"; 
-												//"./src/main/resources/data/ES/train/Turismo_Comunicacion_Hackathon_3l-TAG.csv";
-												//"./src/main/resources/data/ES/train/Turismo_Comunicacion_Hackathon_5l-TAG.csv";
-												//"./src/main/resources/data/EN/tweetsEN.csv";
-	private static final String TESTSET_PATH = "./src/main/resources/data/ES/test/SocialMoriarty_SentimentAnalysis_test1051.csv"; //"./src/main/resources/data/ES/test/InterTASS_ES_DEV.csv"; //"./src/main/resources/data/ES/test/SocialMoriarty_SentimentAnalysis_test1051.csv"; 
-	private static final String LABELS_DESCRIPTION_PATH = "./src/main/resources/data/ES/train/labels5"; // "./src/main/resources/data/ES/train/labels4"; //"./src/main/resources/data/ES/train/labels5";
-														//"./src/main/resources/data/ES/train/labels3"; 
-														//"./src/main/resources/data/ES/train/labels5";
-														//"./src/main/resources/data/EN/labelsEN";
-	private static final String SENTIMENT_MODEL_PATH = "./src/main/resources/models/ES/ITA/model"; //"./src/main/resources/models/ES/TASS/model"; //"./src/main/resources/models/ES/ITA/model";
-														//"./src/main/resources/models/ES/model"; 
-														//"./src/main/resources/models/EN/model";
-	
-    private static final int batchSize = 16;	//Number of examples in each minibatch
-    private static final int nEpochs = 20;	//Number of epochs (full passes of training data) to train on
-    private static final int hiddenLayerSize = 50;
-    private static final double learningRate = 0.00001;
-    private static final double clip = 1.0;
-    
-    private static final int truncateLength = 50; //Number of words per Tweet
 	
 	private static Logger log = Logger.getLogger(SentimentAnalysisTrain.class.getName());
 	
@@ -72,22 +45,31 @@ public class SentimentAnalysisTrain {
 	}*/
 
 	public static void main(String[] args) {
+		ConfigurationLoader config = new ConfigurationLoader(null);
 		//Load Word2Vec model
 		//WordVectors wordVectors= WordVectorSerializer.loadStaticModel(new File(WORD2VEC_MODEL_PATH)); //StaticWord2Vec
-		Word2Vec word2Vec = WordVectorSerializer.readWord2VecModel(WORD2VEC_MODEL_PATH);
-        //Collection<String> lst = word2Vec.wordsNearestSum("hola", 10);
-        //log.info("10 Words closest to 'hola': {}" + lst);
+		String w2v_model_path = config.word2vecModelPath;
+		Word2Vec word2Vec = WordVectorSerializer.readWord2VecModel(w2v_model_path);
+        //Just to check...
+		Collection<String> lst = word2Vec.wordsNearestSum("hola", 10);
+        log.info("10 Words closest to 'hola': {}" + lst);
         
-        //Create dataset iterators (train & test)
-        //TODO Improve tokenizer/preprocessor
+        //Create dataset iterators (train & test) (TODO Improve tokenizer/preprocessor)
         TokenizerFactory tokenizerFactory = new DefaultTokenizerFactory();
         tokenizerFactory.setTokenPreProcessor(new CommonPreprocessor());
+        
+        String trainset_path = config.trainSetPath;
+        String testset_path = config.testSetPath;
+        String labels_path = config.labelsPath;
+        
+        int batchSize = config.batchSize;
+        int truncateLength = config.truncateLength;
         
         DataSetIterator train = null;
         DataSetIterator test = null;
         try {
-            train = new SentimentIterator(TRAINSET_PATH, word2Vec, batchSize, truncateLength, tokenizerFactory, LABELS_DESCRIPTION_PATH);   
-            test = new SentimentIterator(TESTSET_PATH, word2Vec, batchSize, truncateLength, tokenizerFactory, LABELS_DESCRIPTION_PATH); 
+            train = new SentimentIterator(trainset_path, word2Vec, batchSize, truncateLength, tokenizerFactory, labels_path);   
+            test = new SentimentIterator(testset_path, word2Vec, batchSize, truncateLength, tokenizerFactory, labels_path); 
         }catch(Exception ex) {
         	log.severe("Exception while constructing SentimentIterator.");
         	ex.printStackTrace();
@@ -98,6 +80,12 @@ public class SentimentAnalysisTrain {
         int outputs = train.getLabels().size(); //Number of classes
 
         //Configure neural network
+        String modelPath = config.sentimentModelPath;
+        int nEpochs = config.nEpochs;
+        double learningRate = config.learningRate;
+        int hiddenLayerSize = config.hiddenLayerSize;
+        double clip = config.clip;
+        
         MultiLayerConfiguration conf = new NeuralNetConfiguration.Builder()
             .updater(new RmsProp(learningRate))
             .optimizationAlgo(OptimizationAlgorithm.STOCHASTIC_GRADIENT_DESCENT)//OptimizationAlgorithm.STOCHASTIC_GRADIENT_DESCENT
@@ -154,7 +142,7 @@ public class SentimentAnalysisTrain {
         */
        
         try {
-        	ModelSerializer.writeModel(net, SENTIMENT_MODEL_PATH, true);
+        	ModelSerializer.writeModel(net, modelPath, true);
     		log.info("Model saved. Execution completed successfully.");
         }catch(IOException ioex) {
         	log.info("Model couldn't be saved due to an error: \n" + ioex);
