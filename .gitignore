@@ -6,3 +6,9 @@
 # Maven 
 target/
 
+# Resources
+src/main/resources/models/
+src/main/resources/data/ES/train/
+src/main/resources/data/ES/test/
+
+src/test/resources/
